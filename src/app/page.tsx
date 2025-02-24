@@ -1,95 +1,60 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import React, { useState, useEffect } from "react";
+import styles from "./page.module.scss";
+
+const Home = () => {
+  const [secondsLeft, setSecondsLeft] = useState(1500); // 25分
+  const [isRunning, setIsRunning] = useState(false);
+  const [mode, setMode] = useState("work"); // "work" or "break"
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setInterval> | undefined;
+    if (isRunning) {
+      timer = setInterval(() => {
+        setSecondsLeft((prev) => {
+          if (prev <= 1) {
+            handleSwitchMode();
+            return mode === "work" ? 300 : 1500; // 5分休憩 or 25分作業
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isRunning, mode]);
+
+  const handleSwitchMode = () => {
+    setMode((prevMode) => (prevMode === "work" ? "break" : "work"));
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = String(Math.floor(time / 60)).padStart(2, "0");
+    const seconds = String(time % 60).padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className={styles.container}>
+      <h1>ポモドーロタイマー</h1>
+      <h2>{mode === "work" ? "作業時間" : "休憩時間"}</h2>
+      <div className={styles.timer}>{formatTime(secondsLeft)}</div>
+      <div className={styles.controls}>
+        <button onClick={() => setIsRunning(!isRunning)}>
+          {isRunning ? "停止" : "開始"}
+        </button>
+        <button
+          onClick={() => {
+            setIsRunning(false);
+            setSecondsLeft(1500);
+            setMode("work");
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          リセット
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default Home;

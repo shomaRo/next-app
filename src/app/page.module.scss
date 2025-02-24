@@ -1,0 +1,22 @@
+/* Pomodoro.module.scss */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #fbeaea;
+  font-family: sans-serif;
+}
+
+.timer {
+  font-size: 5rem;
+  margin: 20px 0;
+}
+
+.controls button {
+  margin: 10px;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
